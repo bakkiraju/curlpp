@@ -99,6 +99,14 @@ endif()
 target_link_libraries(${PROJECT_NAME} ${CURL_LIBRARIES} ${CONAN_LIBS})
 set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION 1 VERSION 1.0.0)
 
+set(INCLUDE_INSTALL_ROOT_DIR include)
+set(INCLUDE_INSTALL_DIR ${INCLUDE_INSTALL_ROOT_DIR}/curlpp)
+
+target_include_directories(${PROJECT_NAME}
+	PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+               $<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>
+        )
+
 # Make sure that on unix-platforms shared and static libraries have
 # the same root name, but different suffixes.
 #
@@ -116,8 +124,6 @@ set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION 1 VERSION 1.0.0)
 install(DIRECTORY include/utilspp/ DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/utilspp")
 install(DIRECTORY include/curlpp/ DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/curlpp")
 
-set(INCLUDE_INSTALL_ROOT_DIR include)
-set(INCLUDE_INSTALL_DIR ${INCLUDE_INSTALL_ROOT_DIR}/curlpp)
 
 install(TARGETS ${PROJECT_NAME}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
