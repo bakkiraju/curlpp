@@ -10,6 +10,10 @@ if(POLICY CMP0042)
     set(CMAKE_MACOSX_RPATH TRUE)
 endif()
 
+if(POLICY CMP0077)
+    cmake_policy(SET CMP0077 NEW) # CMake option behaviour
+endif()
+
 # for unix platform, define install directories.
 include(GNUInstallDirs)
 
@@ -30,7 +34,7 @@ if(WIN32)
         #
         # for non-windows platform we try to keep cmake 2.8 support
         # since entreprise distribution tends to have 2.8 version.
-        add_compile_options(-std=c++11)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
     else()
         # c++ 11 support from cmake 3.1 or newer
         set(CMAKE_CXX_STANDARD 11) # C++11...
@@ -56,7 +60,6 @@ add_subdirectory(extras)
 # Seems simple.
 
 message(STATUS "Looking for CURL")
-include(FindCURL)
 find_package(CURL REQUIRED)
 
 if(CURL_FOUND)
@@ -78,7 +81,9 @@ include_directories(
 
 # If building on windows, install path will be in build/winbuild
 if(CMAKE_SYSTEM MATCHES "Windows")
-   set(CMAKE_INSTALL_PREFIX "winbuild")
+   if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+      set(CMAKE_INSTALL_PREFIX "winbuild")
+   endif()
 endif()
 
 file(GLOB_RECURSE HeaderFileList "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
@@ -113,5 +118,4 @@ install(DIRECTORY include/curlpp/ DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/curlp
 
 install(TARGETS ${PROJECT_NAME}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
