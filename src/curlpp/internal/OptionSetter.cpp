@@ -113,7 +113,7 @@ struct Callbacks
 		return handle->executeSslCtxFunctor(ssl_ctx);
 	}
 
-}
+};
 
 
 void OptionSetter<curlpp::Forms, CURLOPT_HTTPPOST>
