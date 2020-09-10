@@ -89,14 +89,15 @@ endif()
 file(GLOB_RECURSE HeaderFileList "${CMAKE_CURRENT_SOURCE_DIR}/include/*")
 file(GLOB_RECURSE SourceFileList "${CMAKE_CURRENT_SOURCE_DIR}/src/*")
 
-option(CURLPP_BUILD_SHARED_LIBS "Build shared libraries" ON)
+option(CURLPP_BUILD_SHARED_LIBS "Build shared libraries" OFF)
 if(CURLPP_BUILD_SHARED_LIBS)
-   add_library(${PROJECT_NAME} SHARED ${HeaderFileList} ${SourceFileList})
-   target_link_libraries(${PROJECT_NAME} ${CURL_LIBRARIES} ${CONAN_LIBS})
-   set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION 1 VERSION 1.0.0)
+  add_library(${PROJECT_NAME} SHARED ${HeaderFileList} ${SourceFileList})
+else()
+  add_library(${PROJECT_NAME} STATIC ${HeaderFileList} ${SourceFileList})
 endif()
 
-add_library(${PROJECT_NAME}_static STATIC ${HeaderFileList} ${SourceFileList})
+target_link_libraries(${PROJECT_NAME} ${CURL_LIBRARIES} ${CONAN_LIBS})
+set_target_properties(${PROJECT_NAME} PROPERTIES SOVERSION 1 VERSION 1.0.0)
 
 # Make sure that on unix-platforms shared and static libraries have
 # the same root name, but different suffixes.
@@ -104,22 +105,17 @@ add_library(${PROJECT_NAME}_static STATIC ${HeaderFileList} ${SourceFileList})
 #  (solution taken from https://cmake.org/Wiki/CMake_FAQ#How_do_I_make_my_shared_and_static_libraries_have_the_same_root_name.2C_but_different_suffixes.3F)
 # 
 # Making shared and static libraries have the same root name, but different suffixes
-SET_TARGET_PROPERTIES(${PROJECT_NAME}_static PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
+#SET_TARGET_PROPERTIES(${PROJECT_NAME}_static PROPERTIES OUTPUT_NAME ${PROJECT_NAME})
 # Now the library target "curlpp_static" will be named "curlpp.lib" with MS tools.
 # This conflicts with the "curlpp.lib" import library corresponding to "curlpp.dll",
 # so we add a "lib" prefix (which is default on other platforms anyway):
-SET_TARGET_PROPERTIES(${PROJECT_NAME}_static PROPERTIES PREFIX "lib")
-target_link_libraries(${PROJECT_NAME}_static ${CURL_LIBRARIES} ${CONAN_LIBS})
+#SET_TARGET_PROPERTIES(${PROJECT_NAME}_static PROPERTIES PREFIX "lib")
+#target_link_libraries(${PROJECT_NAME}_static ${CURL_LIBRARIES} ${CONAN_LIBS})
 
 # install headers
 install(DIRECTORY include/utilspp/ DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/utilspp")
 install(DIRECTORY include/curlpp/ DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/curlpp")
 
-if(CURLPP_BUILD_SHARED_LIBS)
 install(TARGETS ${PROJECT_NAME}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-endif()
-install(TARGETS ${PROJECT_NAME}_static
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
